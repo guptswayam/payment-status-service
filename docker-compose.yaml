@@ -1,0 +1,85 @@
+services:
+  postgres:
+    image: postgres:12-alpine
+    container_name: postgres_container
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: payment_assignment
+    ports:
+      - "5432:5432"
+    # volumes:
+    #   - ./.data/postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "echo xyz"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+  kafka:
+    image: apache/kafka:latest
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    environment:
+      # Configures the broker to act as both a broker and a controller (KRaft mode)
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@127.0.0.1:9093'
+      
+      # Defines listeners for internal container communication and host machine access
+      KAFKA_LISTENERS: 'INTERNAL://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093'
+      KAFKA_ADVERTISED_LISTENERS: 'INTERNAL://kafka:9092'
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'INTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'INTERNAL'
+      
+      # Offsets and topic configurations for local development
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_LOG_DIRS: '/var/lib/kafka/data'
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    # volumes:
+    #   - ./.data/kafka_data:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD-SHELL", "echo xyz"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # kcat:
+  #   image: edenhill/kcat:1.7.1
+  #   depends_on:
+  #     kafka:
+  #       condition: service_healthy
+  #   # This keeps the container alive so you can execute commands inside it
+  #   entrypoint: [ "sh", "-c", "tail -f /dev/null" ]
+
+  transaction-status-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "7080:7080" # Exposed directly to your host machine
+    environment:
+      - NODE_ENV=development
+      - HMAC_SECRET=super-secret-key
+      # Essential for ensuring file changes sync reliably inside Docker volumes
+      - CHOKIDAR_USEPOLLING=true 
+    volumes:
+      # Mounts your local project folder into the container
+      - .:/app
+      # Prevents your local node_modules from overriding the container's linux-compiled versions
+      - /app/node_modules
+      - /app/dist
+      - /app/.data
+    depends_on:
+      postgres:
+        condition: service_healthy
+        restart: true
+      kafka:
+        condition: service_healthy
+        restart: true

@@ -1,0 +1,75 @@
+{
+  "info": {
+    "_postman_id": "fdebf5da-3fbf-41e1-abdd-df92c4256a20",
+    "name": "Transaction Status Service",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "10583927"
+  },
+  "item": [
+    {
+      "name": "Payment Event",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CryptoJS = require('crypto-js');\n\n// 1. Get the current request body\nlet requestBody = pm.request.body.raw;\n\n// Fallback if the body is empty\nif (!requestBody) {\n    requestBody = \"\";\n}\n\n// 2. Define your secret key (replace with your actual secret)\nconst secretKey = \"super-secret-key\";\n\n// 3. Generate the HMAC-SHA256 hash (or standard SHA-256 depending on your API requirements)\n// Use CryptoJS.HmacSHA256 for HMAC, or CryptoJS.SHA256 for a plain hash\nconst signature = CryptoJS.HmacSHA256(JSON.stringify(JSON.parse(requestBody)), secretKey).toString(CryptoJS.enc.Hex);\n\n// 4. Set the header for the request\npm.request.headers.add({\n    key: \"x-signature\",\n    value: signature\n});\n\nconsole.log(\"Generated x-signature:\", signature);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "x-signature",
+            "value": ""
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"event_id\": \"evt_9f83a2b1-4c7d-4e2f-9a1b-8c7d6e5f4a3a\",\n    \"event_type\": \"payment.succeeded\",\n    \"transaction_id\": \"txn_8h7g6f5e-4d3c-2b1a-0f9e-8d7c6b5a4f3e\",\n    \"amount\": \"199.99\",\n    \"currency\": \"INR\",\n    \"occurred_at\": \"2026-09-25T11:33:00Z\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:7080/webhooks/payment",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "7080",
+          "path": [
+            "webhooks",
+            "payment"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Transaction Details",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:7080/transactions/txn_8h7g6f5e-4d3c-2b1a-0f9e-8d7c6b5a4f3e",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "7080",
+          "path": [
+            "transactions",
+            "txn_8h7g6f5e-4d3c-2b1a-0f9e-8d7c6b5a4f3e"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

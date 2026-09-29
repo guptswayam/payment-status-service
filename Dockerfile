@@ -7,8 +7,9 @@ COPY package*.json ./
 
 RUN npm install
 
-# We don't COPY the rest of the files here because we will bind-mount 
-# them dynamically in the docker-compose file for live reloading.
+# Next line is optional in development. As docker compose will bind-mount 
+# them dynamically for live reloading.
+COPY . .
 
 EXPOSE 7080
 

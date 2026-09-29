@@ -47,7 +47,7 @@ Worker->>Kafka: Commit Message Offset
 
 ## 3. Idempotency
 1. Considering the event id as unique identifier to avoid the duplicate processing of event.
-2. Event Id is registered at Primary Key in database
+2. Event Id is registered as Primary Key in database
 
 
 ## 4. Ordering (event ordering and correct latest Transaction Status)
@@ -74,15 +74,7 @@ if (prevRecordedEvent && prevRecordedEvent.occurredAt > new Date(occurred_at))
     - *Must implement Sharding in the database system.* Range-based sharding is one of straight-forward strategies that can be implmented to overcome it.
     - database connection pooling should be there in place, requiring multiple replicas of database as well. 
     - Must run cluster of payment microservice processes
-    - Observability
+    - Add Observability
 2. The possible bottlenecks would either be Database or missing batch processing of events leading to a filled queue and delayed processing
 
 
-## 7. Observability
-1. Metrics (CPU utilization, memory consumption, scale in-out) can be observed using tools like Prometheus and Grafana.
-2. It should generate automated alerts for:
-    - reaching threshold limits CPU/memory usage
-    - growing difference b/w produced and consumed offsets in a topic and reaching threshold limits
-    - database cpu usage and connection reaching threshold limits.
-3. Logging and tracing (Dynatrace/Splunk) should be there is place and different level application logs can be analysed there in a dashboard.
-    - It should generate alerts for over failures reaching threshold percentage limits

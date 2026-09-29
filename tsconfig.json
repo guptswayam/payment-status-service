@@ -3,7 +3,7 @@
     /* Target & Environment */
     "target": "ES2022",                        /* Specify ECMAScript target version */
     "lib": ["ES2022"],                         /* Specify library files to be included in the compilation */
-    "types": ["node"],
+    "types": ["node", "jest"],
 
     /* Modules */
     "module": "NodeNext",                      /* Specify module code generation for Node.js */
@@ -23,6 +23,6 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true
   },
-  "include": ["src/**/*"],                     /* Include all files in the src folder */
+  "include": ["src/**/*", "src/tests/**/*"],                     /* Include all files in the src folder */
   "exclude": ["node_modules", "dist"]          /* Exclude external dependencies and build output */
 }

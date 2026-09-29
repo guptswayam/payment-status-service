@@ -4,7 +4,7 @@ import paymentEventConsumer from "./kafka/paymentEvent.consumer";
 import paymentRoutes from "./routes/payment.routes"
 import producer from "./kafka/producers";
 
-const app = express();
+export const app = express();
 app.use(express.json());
 
 app.get("/healthcheck", (_, res) => {

@@ -6,7 +6,12 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "start": "rimraf dist && npm run build && node dist/index.js",
+    "test:integration": "npx jest src/tests/integration",
     "build": "tsc"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node"
   },
   "keywords": [],
   "author": "",
@@ -14,7 +19,12 @@
   "type": "commonjs",
   "devDependencies": {
     "@types/express": "^5.0.6",
+    "@types/jest": "^30.0.0",
     "@types/node": "^26.6.2",
+    "@types/supertest": "^7.2.1",
+    "better-sqlite3": "^12.11.1",
+    "jest": "^30.5.2",
+    "supertest": "^7.3.0",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2"
   },
